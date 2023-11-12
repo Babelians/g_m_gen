@@ -1,0 +1,12 @@
+﻿  g_m_gen.cpp
+C:\g_m_creater\g_m_creater\g_m_gen.h(75,1): warning C4267: '引数': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\g_m_gen.h(93,1): warning C4267: '引数': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\g_m_gen.h(100,1): warning C4267: '初期化中': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\g_m_gen.cpp(73,65): warning C4267: '引数': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+  main.cpp
+C:\g_m_creater\g_m_creater\g_m_gen.h(75,1): warning C4267: '引数': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\g_m_gen.h(93,1): warning C4267: '引数': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\g_m_gen.h(100,1): warning C4267: '初期化中': 'size_t' から 'int32_t' に変換しました。データが失われているかもしれません。
+C:\g_m_creater\g_m_creater\main.cpp(6,1): warning C4326: 'main' の戻り値の型には、'int' を使用してください。'void' は使用できません
+  コードを生成中...
+  g_m_creater.vcxproj -> C:\g_m_creater\x64\Debug\g_m_creater.exe
