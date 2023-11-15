@@ -4,22 +4,35 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <iterator>
 
 using namespace std;
 
 #define len(x) sizeof(x) / sizeof(x[0])
 
-const int32_t ACCOUSTIC_PIANO=1,ELECTRIC_BASS_FINGER = 21,OVERDRIVEN_GUITAR=30,DISTORTION_GUITAR=31,VIOLIN=41,OBOE=69, FLUTE=74;
+template <typename T> int32_t length(T list)
+{
+	int32_t i = 0;
+	while (list[i])
+	{
+		i++;
+	}
+
+	return i;
+}
+
+const int32_t DRUMS=-1,ACCOUSTIC_PIANO=0x00, HARPSICHORD=0x06,ACCOUSTIC_GUITAR_STEEL=0x1B, OVERDRIVEN_GUITAR=0x19, DISTORTION_GUITAR = 0x1E,
+			  ELECTRIC_BASS_FINGER = 0x21,VIOLIN=0x28,VIOLA=0x29, CELLO=0x2A, OBOE=0x44, FLUTE=0x49;
 
 class g_m_gen
 {
 public:
-	bool create_g_m(char file_name[], vector<int32_t>program_changes);
+	g_m_gen();
+	~g_m_gen();
+	bool create_g_m(char* file_path, vector<int32_t>program_changes);
 
 private:
-	void read_midi(char* file_name);
-	void write_midi(char* file_name);
-	char* file_name;
+
 	struct track
 	{
 		char mtrk[4];
@@ -39,12 +52,15 @@ private:
 
 	standard_midi sm;
 
+	void read_midi(char* file_path);
+	void write_midi(char* file_path);
+	char* hoge; //このような何らかのポインタ変数を定義しないとバイナリファイルの各バイトにccccccがついて値がおかしくなる。
+
 	bool read(ifstream& fin, int32_t* data, int32_t len)
 	{
 		for (int i = 0; i < len; i++)
 		{
 			fin.read(reinterpret_cast<char*>(&data[i]), 1);
-			//data[i] -= correction;
 		}
 
 		return true;
@@ -55,7 +71,6 @@ private:
 		for (int i = 0; i < len; i++)
 		{
 			fout.write(reinterpret_cast<char*>(&data[i]), 1);
-			//data[i] += correction;
 		}
 
 		return true;
@@ -137,11 +152,11 @@ private:
 				}
 				else if(0xC0 <= track.data[i] && track.data[i] <= 0xCF) //プログラムチェンジ
 				{
-					cout << "delete start\n";
-					track.data.erase(track.data.begin() + start_index, track.data.begin() + i + 1); // 既存のプログラムチェンジを削除
+					cout << "try to delete program change : " << hex << track.data[i+1] << "\n";
+					track.data.erase(track.data.begin() + start_index, track.data.begin() + i + 2); // 既存のプログラムチェンジを削除
 					update_track_size(track); cout << "deleted instrument\n";
 					i -= 2;
-					break;
+					//break;
 				}
 				else if (0xD0 <= track.data[i] && track.data[i] <= 0xDF) //チャンネルプレッシャー
 				{
@@ -229,5 +244,76 @@ private:
 		}
 
 		return mul;
+	}
+
+	char* get_file_name(char* path, int32_t len)
+	{
+		int32_t backslash_size = 0;
+		int32_t file_name_len = 0;
+
+		for (int32_t i = 0; i < len; i++)
+		{
+			int32_t idx = len - 1 - i;
+			if (path[idx] == '\\')
+			{
+				file_name_len = i;
+				break;
+			}
+		}
+
+		char* file_name = new char[file_name_len];
+
+		int32_t i = 0;
+		int32_t path_idx = len - 1 - i;
+		while (path[path_idx] != '\\')
+		{   
+			path_idx = len - 1 - i;
+			int32_t fname_idx = file_name_len - 1 - i;
+			file_name[fname_idx] = path[path_idx];
+			i++;
+		}
+
+		return file_name;
+	}
+
+	char* add_file_name(char* file_name, const char* add)
+	{
+		int32_t file_name_len = 0;
+		while (file_name[file_name_len])
+		{
+			file_name_len++;
+		}
+
+		int32_t add_len = 0;
+		while (add[add_len])
+		{
+			add_len++;
+		}
+		int32_t ofname_len = file_name_len + add_len;
+		char* ofname = new char[ofname_len];
+
+		int32_t idx = file_name_len - 1;
+		int32_t ofname_idx = ofname_len - 1;
+
+		for (int32_t i = 0; i < file_name_len; i++)
+		{
+			ofname[ofname_idx] = file_name[idx];
+
+			if (ofname[ofname_idx] == '.')
+			{
+				for (int32_t j = 0; j < add_len; j++)
+				{
+					int32_t jdx = add_len - 1 - j;
+					ofname_idx--;
+					ofname[ofname_idx] = add[jdx];
+				}
+			}
+			idx--;
+			ofname_idx--;
+		}
+
+		ofname[ofname_len] = NULL;
+
+		return ofname;
 	}
 };

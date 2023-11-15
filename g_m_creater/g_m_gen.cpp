@@ -1,36 +1,48 @@
 #include "g_m_gen.h"
 
-bool g_m_gen::create_g_m(char file_name[], vector<int32_t>program_changes)
+g_m_gen::g_m_gen()
 {
-	read_midi(file_name);
+
+}
+
+g_m_gen::~g_m_gen()
+{
+
+}
+
+bool g_m_gen::create_g_m(char* file_path, vector<int32_t>program_changes)
+{
+	read_midi(file_path);
 
 	for (int32_t i = 0; i < sm.tracks.size(); i++)
 	{
-		insert_program_change(sm.tracks[i], program_changes[i]);
+		int32_t conductor_track = 0;
+		if (i != conductor_track)
+		{
+			insert_program_change(sm.tracks[i], program_changes[i - 1]);
+		}
 	}
 
-	char ofname[200] = "aaaaa.mid";
+	const int max_fn = 500;
+	char* file_name;
+	file_name = get_file_name(file_path, max_fn);
+
+	char* ofname = add_file_name(file_name, "_GM");
+
 	write_midi(ofname);
 
 	return true;
 }
 
-void g_m_gen::read_midi(char* file_name)
+void g_m_gen::read_midi(char* file_path)
 {
-	ifstream fin(file_name, ios::in | ios::binary);
-	if (!fin) {
-		cout << "failed to read midi" << "\n";
-	}
-	else
-	{
-		this->file_name = file_name;
-	}
+	ifstream fin(file_path, ios::in | ios::binary);
 
 	// メタデータ
 	fin.read(sm.mthd, 4);
 	read(fin, sm.header_size, len(sm.header_size));
 	read(fin, sm.format, len(sm.format));
-	read(fin, sm.track_size, len(sm.track_size));
+	read(fin, sm.track_size, len(sm.track_size)); cout << dec << "track size :" << hex_to_decimal(sm.track_size, len(sm.track_size)) - 1 << "\n";
 	read(fin, sm.bpm, len(sm.bpm));
 	
 	// トラック数をリサイズ
@@ -52,11 +64,11 @@ void g_m_gen::read_midi(char* file_name)
 	fin.close();
 }
 
-void g_m_gen::write_midi(char* file_name)
+void g_m_gen::write_midi(char* file_path)
 {
-	ofstream fout(file_name, ios::out | ios::binary);
+	ofstream fout(file_path, ios::out | ios::binary);
 	if (!fout) {
-		return;
+		cout << "failed to create gm\n";
 	}
 	fout.write(sm.mthd, 4);
 	write(fout, sm.header_size, 4);

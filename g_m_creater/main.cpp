@@ -1,24 +1,31 @@
 #include <iostream>
 #include <vector>
+#include "console_art.h"
 #include "g_m_gen.h"
 
-void main()
+int main()
 {
 	vector<int> pc = {
-		FLUTE, VIOLIN, ACCOUSTIC_PIANO, OBOE, ELECTRIC_BASS_FINGER, OVERDRIVEN_GUITAR, 1, OVERDRIVEN_GUITAR, -1
+		ACCOUSTIC_PIANO, FLUTE, VIOLIN, CELLO, HARPSICHORD, DISTORTION_GUITAR,DISTORTION_GUITAR,
+		ACCOUSTIC_GUITAR_STEEL, ELECTRIC_BASS_FINGER, DRUMS
 	};
-	
+	cout << "================\n"
+		<< "-----GM-Gen-----\n"
+		<< "================\n";
+	cout << art;
 	char file_name[500];
-	cout << "MIDIファイルのパスを入力してください。\n";
+	cout << "Input your MIDI file pass. Also you can drag and drop the file to input the pass.\n";
 	cin >> file_name;
 
 	g_m_gen gg;
 	if (!gg.create_g_m(file_name, pc))
 	{
-		cout << "failed";
+		cout << "failed!";
+		return -1;
 	}
 	else
 	{
-		cout << "正常に終了しました。";
+		cout << "successfully finished.";
+		return 0;
 	}
 }
